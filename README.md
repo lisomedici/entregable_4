@@ -14,7 +14,7 @@ Prototipo funcional para operacionalizar el modelo de churn temprano de Kavak Se
 
 El dashboard se puede abrir directo desde el repo con este link:
 
-https://raw.githack.com/lisomedici/entregable_4/ae66ce2682045c0527cad68aed7475b7eecb3b9a/dashboard/index.html
+https://raw.githack.com/lisomedici/entregable_4/545c5255d6272574df218a11976211c701cd4c6a/dashboard/index.html
 
 La version web funciona sin instalar nada. Usa datos demo anonimos para no publicar informacion personal de clientes.
 
@@ -78,5 +78,6 @@ En GitHub Pages no se ejecuta la API PowerShell. Por eso `dashboard/app.js` inte
 5. Filtrar por alto riesgo y mostrar drivers.
 6. Ejecutar una prediccion individual.
 7. Cerrar con proximos pasos: persistir `.joblib`, registrar contactos y reentrenar trimestralmente.
+
 
 

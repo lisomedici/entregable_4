@@ -11,13 +11,17 @@ Prototipo funcional para operacionalizar el modelo de churn temprano de Kavak Se
 - Prediccion individual para simular una poliza nueva.
 - Presentacion corta en HTML para abrir durante la exposicion.
 
-## Link web
+## Link web inmediato
 
-Cuando GitHub Pages termine de publicar el repo, el dashboard queda disponible en:
+El dashboard se puede abrir directo desde el repo con este link:
 
-https://lisomedici.github.io/entregable_4/
+https://raw.githack.com/lisomedici/entregable_4/master/index.html
 
 La version web funciona sin instalar nada. Usa datos demo anonimos para no publicar informacion personal de clientes.
+
+Si se habilita GitHub Pages en Settings, tambien puede publicarse como:
+
+https://lisomedici.github.io/entregable_4/
 
 ## Como correrlo
 

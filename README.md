@@ -15,7 +15,7 @@ Prototipo funcional para operacionalizar el modelo de churn temprano de Kavak Se
 
 El dashboard se puede abrir directo desde el repo con este link:
 
-https://raw.githack.com/lisomedici/entregable_4/86a2c03eff6fabf237acf784910c09f83aeeb0f3/dashboard/index.html
+https://raw.githack.com/lisomedici/entregable_4/6af06a15899f6aa19c738eee5cb3d074bdaaf36b/dashboard/index.html
 
 La version web funciona sin instalar nada. Usa 1.500 polizas activas anonimizadas y generadas desde el CSV para no publicar informacion personal de clientes.
 

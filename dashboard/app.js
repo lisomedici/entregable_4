@@ -36,10 +36,10 @@ async function loadSummary() {
     summary = window.DEMO_SUMMARY;
     state.demoMode = true;
   }
-  el("activeCount").textContent = summary.activas.toLocaleString("es-AR");
-  el("highCount").textContent = summary.alto.toLocaleString("es-AR");
-  el("baseRate").textContent = pct(summary.base_churn_temprano);
-  el("precisionTop20").textContent = pct(summary.precision_top20_entregable_3);
+  if (el("activeCount")) el("activeCount").textContent = summary.activas.toLocaleString("es-AR");
+  if (el("highCount")) el("highCount").textContent = summary.alto.toLocaleString("es-AR");
+  if (el("baseRate")) el("baseRate").textContent = pct(summary.base_churn_temprano);
+  if (el("precisionTop20")) el("precisionTop20").textContent = pct(summary.precision_top20_entregable_3);
 }
 
 async function loadPolicies() {

@@ -9,7 +9,6 @@ Prototipo funcional para operacionalizar el modelo de churn temprano de Kavak Se
 - Version web estatica para GitHub Pages, con datos demo anonimos.
 - Ranking de polizas activas ordenadas por score de churn.
 - Prediccion individual para simular una poliza nueva.
-- Presentacion corta en HTML para abrir durante la exposicion.
 
 ## Link web inmediato
 
@@ -34,7 +33,6 @@ powershell -ExecutionPolicy Bypass -File .\run_dashboard.ps1
 Luego abrir:
 
 - Dashboard: http://localhost:8787/
-- Presentacion: http://localhost:8787/presentacion
 - Healthcheck API: http://localhost:8787/api/health
 
 Si el CSV esta en otra ruta:

@@ -6,9 +6,18 @@ Prototipo funcional para operacionalizar el modelo de churn temprano de Kavak Se
 
 - API local ejecutable en PowerShell.
 - Dashboard HTML que consume la API.
+- Version web estatica para GitHub Pages, con datos demo anonimos.
 - Ranking de polizas activas ordenadas por score de churn.
 - Prediccion individual para simular una poliza nueva.
 - Presentacion corta en HTML para abrir durante la exposicion.
+
+## Link web
+
+Cuando GitHub Pages termine de publicar el repo, el dashboard queda disponible en:
+
+https://lisomedici.github.io/entregable_4/
+
+La version web funciona sin instalar nada. Usa datos demo anonimos para no publicar informacion personal de clientes.
 
 ## Como correrlo
 
@@ -47,6 +56,8 @@ Como en esta computadora no esta disponible Python ni el `.joblib` entrenado, el
 La arquitectura deja el scoring encapsulado en `api/server.ps1`. En una version productiva, esa funcion se reemplaza por la carga del modelo persistido (`mejor_modelo_churn.joblib`) y los encoders generados desde Colab, manteniendo iguales los endpoints y el dashboard.
 
 Para que la demo abra rapido en una computadora sin Python, el ranking inicial scorea una muestra operativa de hasta 1.200 polizas activas del CSV. El endpoint y la interfaz quedan listos para ampliar ese limite si se ejecuta en un entorno mas comodo.
+
+En GitHub Pages no se ejecuta la API PowerShell. Por eso `dashboard/app.js` intenta consumir `/api/*` y, si no existe, cambia automaticamente a modo demo web con `dashboard/demo-data.js`.
 
 ## Guion de demo sugerido
 

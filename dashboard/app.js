@@ -1,6 +1,7 @@
 const state = {
   policies: [],
-  filtered: []
+  filtered: [],
+  demoMode: false
 };
 
 const el = (id) => document.getElementById(id);
@@ -26,7 +27,14 @@ async function getJson(url, options) {
 }
 
 async function loadSummary() {
-  const summary = await getJson("/api/summary");
+  let summary;
+  try {
+    summary = await getJson("/api/summary");
+    state.demoMode = false;
+  } catch {
+    summary = window.DEMO_SUMMARY;
+    state.demoMode = true;
+  }
   el("activeCount").textContent = summary.activas.toLocaleString("es-AR");
   el("highCount").textContent = summary.alto.toLocaleString("es-AR");
   el("baseRate").textContent = pct(summary.base_churn_temprano);
@@ -36,7 +44,13 @@ async function loadSummary() {
 async function loadPolicies() {
   const limit = Number(el("limitInput").value || 80);
   const reveal = el("revealContact").checked ? "1" : "0";
-  state.policies = await getJson(`/api/policies?limit=${limit}&reveal=${reveal}`);
+  try {
+    state.policies = await getJson(`/api/policies?limit=${limit}&reveal=${reveal}`);
+    state.demoMode = false;
+  } catch {
+    state.policies = (window.DEMO_POLICIES || []).slice(0, limit);
+    state.demoMode = true;
+  }
   applyFilters();
 }
 
@@ -68,7 +82,8 @@ function reasonsHtml(reasons) {
 function renderPolicies() {
   const body = el("policiesBody");
   body.innerHTML = "";
-  el("tableCaption").textContent = `${state.filtered.length} polizas visibles, ordenadas por score descendente.`;
+  const mode = state.demoMode ? "Modo web demo con datos anonimos. " : "";
+  el("tableCaption").textContent = `${mode}${state.filtered.length} polizas visibles, ordenadas por score descendente.`;
 
   if (!state.filtered.length) {
     body.innerHTML = `<tr><td colspan="7">No hay polizas para los filtros seleccionados.</td></tr>`;
@@ -85,7 +100,7 @@ function renderPolicies() {
       </td>
       <td>
         <strong>${p.cliente || "Sin nombre"}</strong>
-        <span class="subtle">${p.region} · ${p.aseguradora}</span>
+        <span class="subtle">${p.region} - ${p.aseguradora}</span>
       </td>
       <td>
         <strong>${p.telefono || "-"}</strong>
@@ -133,14 +148,101 @@ function renderPrediction(result) {
   `;
 }
 
+function num(value) {
+  const parsed = Number(String(value || "0").replace(/[^0-9.-]/g, ""));
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function demoPredict(payload) {
+  let score = 0.255;
+  const reasons = [];
+  const aseguradora = String(payload.Aseguradora || "").toLowerCase();
+  const cluster = String(payload.Cluster_Detalle || "");
+  const metodo = String(payload.Metodo_de_pago || "");
+  const cuota = num(payload.Valor_cuota_mes_pesos);
+  const comision = num(payload.Comision_pesos);
+  const anio = num(payload.anio_bien);
+  const renovacion = num(payload.Es_renovacion_ID_poliza_anterior);
+
+  if (aseguradora.includes("zurich")) {
+    score += 0.10;
+    reasons.push({ label: "aseguradora", text: "Aseguradora con mayor churn historico", impact: 0.10 });
+  } else if (aseguradora.includes("sura")) {
+    score += 0.08;
+    reasons.push({ label: "aseguradora", text: "Aseguradora con churn sobre promedio", impact: 0.08 });
+  } else if (aseguradora.includes("mercantil")) {
+    score += 0.05;
+    reasons.push({ label: "aseguradora", text: "Aseguradora con riesgo medio-alto", impact: 0.05 });
+  }
+
+  if (cluster.includes("Terceros")) {
+    score += 0.04;
+    reasons.push({ label: "cobertura", text: "Cobertura de terceros", impact: 0.04 });
+  }
+  if (metodo === "bankAccount") {
+    score += 0.06;
+    reasons.push({ label: "pago", text: "Metodo de pago CBU", impact: 0.06 });
+  }
+  if (cuota >= 150000) {
+    score += 0.11;
+    reasons.push({ label: "cuota", text: "Cuota mensual alta", impact: 0.11 });
+  } else if (cuota >= 100000) {
+    score += 0.06;
+    reasons.push({ label: "cuota", text: "Cuota mensual media-alta", impact: 0.06 });
+  }
+  if (comision >= 22000) {
+    score += 0.05;
+    reasons.push({ label: "comision", text: "Comision alta", impact: 0.05 });
+  }
+  if (anio && 2026 - anio >= 8) {
+    score += 0.04;
+    reasons.push({ label: "vehiculo", text: "Vehiculo con mayor antiguedad", impact: 0.04 });
+  }
+  if (!renovacion) {
+    score += 0.07;
+    reasons.push({ label: "renovacion", text: "Poliza nueva, no renovacion", impact: 0.06 });
+  } else {
+    score -= 0.09;
+  }
+
+  score = clamp((score * 0.60) + 0.02, 0.03, 0.82);
+  const nivel = score > 0.40 ? "Alto" : score >= 0.20 ? "Medio" : "Bajo";
+  const accion = nivel === "Alto"
+    ? "Contactar en la primera semana y revisar dolor de precio/cobertura."
+    : nivel === "Medio"
+      ? "Seguimiento preventivo durante onboarding."
+      : "Flujo normal de onboarding.";
+
+  return {
+    input: payload,
+    prediction: {
+      score_churn: Math.round(score * 1000) / 1000,
+      nivel_riesgo: nivel,
+      accion_recomendada: accion,
+      razones: reasons.sort((a, b) => b.impact - a.impact).slice(0, 3)
+    }
+  };
+}
+
 async function predict(event) {
   event.preventDefault();
   const payload = formToObject(event.currentTarget);
-  const result = await getJson("/api/predict", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  });
+  let result;
+  try {
+    result = await getJson("/api/predict", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    state.demoMode = false;
+  } catch {
+    result = demoPredict(payload);
+    state.demoMode = true;
+  }
   renderPrediction(result);
 }
 
@@ -148,7 +250,7 @@ async function refreshAll() {
   try {
     await loadSummary();
     await loadPolicies();
-    showToast("Dashboard actualizado");
+    showToast(state.demoMode ? "Demo web cargada" : "Dashboard actualizado");
   } catch (err) {
     console.error(err);
     showToast("Error al cargar datos");

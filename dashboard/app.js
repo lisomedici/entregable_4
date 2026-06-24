@@ -151,6 +151,15 @@ function renderPrediction(result) {
   `;
 }
 
+function renderPredictionError(message) {
+  el("predictionResult").innerHTML = `
+    <div class="empty">
+      <strong>No se puede calcular el score</strong>
+      <p>${message}</p>
+    </div>
+  `;
+}
+
 function num(value) {
   const parsed = Number(String(value || "0").replace(/[^0-9.-]/g, ""));
   return Number.isFinite(parsed) ? parsed : 0;
@@ -161,6 +170,21 @@ function clamp(value, min, max) {
 }
 
 function demoPredict(payload) {
+  const allowedInsurers = ["zurich", "sura", "mercantilAndina", "allianz", "experta"];
+  const allowedClusters = [
+    "Terceros Completo Premium",
+    "Terceros Completo",
+    "Todo Riesgo con Franquicia Alta",
+    "Todo Riesgo con Franquicia Baja"
+  ];
+
+  if (!allowedInsurers.includes(payload.Aseguradora)) {
+    throw new Error("Selecciona una aseguradora valida del listado.");
+  }
+  if (!allowedClusters.includes(payload.Cluster_Detalle)) {
+    throw new Error("Selecciona una cobertura valida del listado.");
+  }
+
   let score = 0.255;
   const reasons = [];
   const aseguradora = String(payload.Aseguradora || "").toLowerCase();
@@ -243,8 +267,13 @@ async function predict(event) {
     });
     state.demoMode = false;
   } catch {
-    result = demoPredict(payload);
-    state.demoMode = true;
+    try {
+      result = demoPredict(payload);
+      state.demoMode = true;
+    } catch (err) {
+      renderPredictionError(err.message);
+      return;
+    }
   }
   renderPrediction(result);
 }

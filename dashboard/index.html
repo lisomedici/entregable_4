@@ -108,12 +108,27 @@
     <section class="layout lower">
       <section class="panel">
         <div class="panel-title">
-          <h2>Prediccion individual</h2>
-          <p>Simula una poliza nueva y consulta la API.</p>
+          <h2>Simulador de poliza nueva</h2>
+          <p>Opcional: estima el riesgo de una poliza que todavia no aparece en el ranking.</p>
         </div>
         <form id="predictForm" class="grid-form">
-          <label>Aseguradora<input name="Aseguradora" value="zurich"></label>
-          <label>Cluster<input name="Cluster_Detalle" value="Terceros Completo Premium"></label>
+          <label>Aseguradora
+            <select name="Aseguradora">
+              <option value="zurich">zurich</option>
+              <option value="sura">sura</option>
+              <option value="mercantilAndina">mercantilAndina</option>
+              <option value="allianz">allianz</option>
+              <option value="experta">experta</option>
+            </select>
+          </label>
+          <label>Tipo de cobertura
+            <select name="Cluster_Detalle">
+              <option value="Terceros Completo Premium">Terceros Completo Premium</option>
+              <option value="Terceros Completo">Terceros Completo</option>
+              <option value="Todo Riesgo con Franquicia Alta">Todo Riesgo con Franquicia Alta</option>
+              <option value="Todo Riesgo con Franquicia Baja">Todo Riesgo con Franquicia Baja</option>
+            </select>
+          </label>
           <label>Metodo de pago
             <select name="Metodo_de_pago">
               <option value="creditCard">creditCard</option>
@@ -128,7 +143,13 @@
               <option value="Sin dato">Sin dato</option>
             </select>
           </label>
-          <label>Rango comision<input name="rango_comision" value="standard"></label>
+          <label>Rango comision
+            <select name="rango_comision">
+              <option value="standard">standard</option>
+              <option value="low">low</option>
+              <option value="high">high</option>
+            </select>
+          </label>
           <label>Fecha inicio<input name="fecha_inicio_poliza" type="date" value="2026-06-24"></label>
           <label>Fecha nacimiento<input name="fecha_nacimiento" type="date" value="1994-05-10"></label>
           <label>Anio bien<input name="anio_bien" type="number" value="2018"></label>
@@ -149,9 +170,9 @@
       <section class="panel result-panel">
         <div class="panel-title">
           <h2>Resultado</h2>
-          <p>Salida de `/api/predict`.</p>
+          <p>Score estimado para la poliza nueva ingresada.</p>
         </div>
-        <div id="predictionResult" class="empty">Completa el formulario y ejecuta la prediccion.</div>
+        <div id="predictionResult" class="empty">Este simulador sirve para evaluar una poliza al momento de emitirla. Para operar la cartera actual, usa la lista de polizas a contactar.</div>
       </section>
     </section>
   </main>

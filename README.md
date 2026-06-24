@@ -8,6 +8,7 @@ Prototipo funcional para operacionalizar el modelo de churn temprano de Kavak Se
 - Dashboard HTML que consume la API.
 - Version web estatica para GitHub Pages, con datos demo anonimos.
 - Ranking de polizas activas ordenadas por score de churn.
+- Solapa de insights con graficos de riesgo por aseguradora, metodo de pago, region y drivers.
 - Prediccion individual para simular una poliza nueva.
 
 ## Link web inmediato
@@ -55,6 +56,7 @@ powershell -ExecutionPolicy Bypass -File .\run_dashboard.ps1 -CsvPath "C:\ruta\a
 - **Nivel de riesgo**: filtra las polizas por score: Alto `> 0,40`, Medio `0,20 a 0,40`, Bajo `< 0,20`.
 - **Maximo a mostrar**: limita cuantas filas se ven en la tabla despues de aplicar busqueda y filtro. Por ejemplo, si hay 1.118 polizas de riesgo medio y el maximo es 80, muestra las 80 de mayor score dentro de Medio.
 - **Buscar poliza, patente o cliente**: busca dentro de la lista evaluada.
+- **Insights**: resume donde se concentra el alto riesgo y sugiere focos de accion para campanas de retencion.
 - **Simulador de poliza nueva**: es opcional. Sirve para demostrar que el sistema tambien puede recibir datos de una poliza que todavia no esta en cartera/ranking y devolver un score. Para el trabajo diario de retencion, la vista principal es la lista de polizas a contactar.
 
 ## Nota metodologica

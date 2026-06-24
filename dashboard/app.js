@@ -82,6 +82,74 @@ function reasonsHtml(reasons) {
   return `<ul class="reason-list">${reasons.map((r) => `<li>${r.text}</li>`).join("")}</ul>`;
 }
 
+function countBy(items, keyFn) {
+  const map = new Map();
+  items.forEach((item) => {
+    const key = keyFn(item) || "Sin dato";
+    map.set(key, (map.get(key) || 0) + 1);
+  });
+  return [...map.entries()]
+    .map(([label, value]) => ({ label, value }))
+    .sort((a, b) => b.value - a.value);
+}
+
+function highRiskItems() {
+  return state.policies.filter((p) => p.nivel_riesgo === "Alto");
+}
+
+function renderBarChart(id, rows, options = {}) {
+  const container = el(id);
+  if (!container) return;
+  const max = Math.max(...rows.map((r) => r.value), 1);
+  const total = options.total || rows.reduce((sum, r) => sum + r.value, 0) || 1;
+  const limit = options.limit || rows.length;
+  const colorClass = options.colorClass || "";
+
+  container.innerHTML = rows.slice(0, limit).map((row) => {
+    const width = Math.max(3, Math.round((row.value / max) * 100));
+    const suffix = options.percent ? ` (${pct(row.value / total)})` : "";
+    return `
+      <div class="bar-row">
+        <div class="bar-label">${row.label}</div>
+        <div class="bar-track"><div class="bar-fill ${colorClass}" style="width:${width}%"></div></div>
+        <div class="bar-value">${row.value}${suffix}</div>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderInsights() {
+  if (!state.policies.length) return;
+
+  const high = highRiskItems();
+  const riskRows = [
+    { label: "Alto", value: high.length },
+    { label: "Medio", value: state.policies.filter((p) => p.nivel_riesgo === "Medio").length },
+    { label: "Bajo", value: state.policies.filter((p) => p.nivel_riesgo === "Bajo").length }
+  ];
+  const insurerRows = countBy(high, (p) => p.aseguradora);
+  const paymentRows = countBy(high, (p) => p.metodo_pago);
+  const regionRows = countBy(high, (p) => p.region);
+  const driverRows = countBy(high.flatMap((p) => p.razones || []), (r) => r.text);
+
+  const mainInsurer = insurerRows[0] || { label: "-", value: 0 };
+  const mainPayment = paymentRows[0] || { label: "-", value: 0 };
+  const suggestedDailyContacts = Math.min(25, high.length);
+
+  el("campaignTitle").textContent = `${mainInsurer.label} + ${mainPayment.label}`;
+  el("campaignText").textContent = `Priorizar ${suggestedDailyContacts} contactos de alto riesgo con foco en precio, cobertura y onboarding.`;
+  el("concentrationTitle").textContent = `${mainInsurer.label}: ${mainInsurer.value}`;
+  el("concentrationText").textContent = `Es la aseguradora con mas polizas de alto riesgo dentro del universo evaluado.`;
+  el("coverageTitle").textContent = `${high.length} casos altos`;
+  el("coverageText").textContent = `${pct(high.length / state.policies.length)} de la cartera evaluada requiere contacto inmediato.`;
+
+  renderBarChart("riskChart", riskRows, { total: state.policies.length, percent: true });
+  renderBarChart("insurerChart", insurerRows, { total: high.length, percent: true, limit: 6, colorClass: "high" });
+  renderBarChart("paymentChart", paymentRows, { total: high.length, percent: true, limit: 4, colorClass: "mid" });
+  renderBarChart("regionChart", regionRows, { total: high.length, percent: true, limit: 4 });
+  renderBarChart("driverChart", driverRows, { total: high.length, percent: true, limit: 8, colorClass: "high" });
+}
+
 function renderPolicies() {
   const body = el("policiesBody");
   body.innerHTML = "";
@@ -123,6 +191,7 @@ function renderPolicies() {
   `).join("");
 
   body.innerHTML = rows;
+  renderInsights();
 }
 
 function formToObject(form) {
@@ -302,6 +371,16 @@ async function copyTop10() {
   }
 }
 
+function switchView(viewId) {
+  document.querySelectorAll(".tab-view").forEach((view) => {
+    view.classList.toggle("active", view.id === viewId);
+  });
+  document.querySelectorAll(".tab").forEach((tab) => {
+    tab.classList.toggle("active", tab.dataset.view === viewId);
+  });
+  if (viewId === "insightsView") renderInsights();
+}
+
 el("refreshBtn").addEventListener("click", refreshAll);
 el("searchInput").addEventListener("input", applyFilters);
 el("riskFilter").addEventListener("change", applyFilters);
@@ -309,5 +388,8 @@ el("limitInput").addEventListener("change", loadPolicies);
 el("revealContact").addEventListener("change", loadPolicies);
 el("predictForm").addEventListener("submit", predict);
 el("copyBtn").addEventListener("click", copyTop10);
+document.querySelectorAll(".tab").forEach((tab) => {
+  tab.addEventListener("click", () => switchView(tab.dataset.view));
+});
 
 refreshAll();

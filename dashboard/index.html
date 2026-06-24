@@ -18,141 +18,210 @@
   </header>
 
   <main>
-    <section class="layout">
-      <aside class="panel controls">
-        <div class="panel-title">
-          <h2>Filtros de priorizacion</h2>
-          <p>Elegis que segmento mirar y cuantas polizas mostrar en la lista.</p>
-        </div>
+    <div class="tabs" role="tablist" aria-label="Vistas del dashboard">
+      <button class="tab active" id="operationTab" type="button" data-view="operationView">Operacion</button>
+      <button class="tab" id="insightsTab" type="button" data-view="insightsView">Insights</button>
+    </div>
 
-        <label>
-          Buscar poliza, patente o cliente
-          <input id="searchInput" type="search" placeholder="Ej: AG701WM, 80913, Garcia">
-        </label>
-
-        <label>
-          Nivel de riesgo
-          <select id="riskFilter">
-            <option value="todos">Todos</option>
-            <option value="Alto">Alto</option>
-            <option value="Medio">Medio</option>
-            <option value="Bajo">Bajo</option>
-          </select>
-        </label>
-
-        <label>
-          Maximo a mostrar
-          <input id="limitInput" type="number" min="10" max="1200" step="10" value="80">
-          <span class="hint">No cambia el score: solo limita cuantas filas aparecen despues de filtrar.</span>
-        </label>
-
-        <label class="check">
-          <input id="revealContact" type="checkbox">
-          Mostrar contacto completo
-        </label>
-
-        <div class="legend">
-          <span><i class="dot high"></i> Alto: score &gt; 0,40</span>
-          <span><i class="dot mid"></i> Medio: 0,20 a 0,40</span>
-          <span><i class="dot low"></i> Bajo: &lt; 0,20</span>
-        </div>
-      </aside>
-
-      <section class="panel table-panel">
-        <div class="panel-title row">
-          <div>
-            <h2>Polizas a contactar</h2>
-            <p id="tableCaption">Ordenadas por score de churn descendente.</p>
+    <section id="operationView" class="tab-view active">
+      <section class="layout">
+        <aside class="panel controls">
+          <div class="panel-title">
+            <h2>Filtros de priorizacion</h2>
+            <p>Elegis que segmento mirar y cuantas polizas mostrar en la lista.</p>
           </div>
-          <button id="copyBtn" type="button">Copiar top 10</button>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Riesgo</th>
-                <th>Poliza</th>
-                <th>Cliente</th>
-                <th>Contacto</th>
-                <th>Auto</th>
-                <th>Cuota</th>
-                <th>Motivo</th>
-              </tr>
-            </thead>
-            <tbody id="policiesBody"></tbody>
-          </table>
-        </div>
+
+          <label>
+            Buscar poliza, patente o cliente
+            <input id="searchInput" type="search" placeholder="Ej: AG701WM, 80913, Garcia">
+          </label>
+
+          <label>
+            Nivel de riesgo
+            <select id="riskFilter">
+              <option value="todos">Todos</option>
+              <option value="Alto">Alto</option>
+              <option value="Medio">Medio</option>
+              <option value="Bajo">Bajo</option>
+            </select>
+          </label>
+
+          <label>
+            Maximo a mostrar
+            <input id="limitInput" type="number" min="10" max="1200" step="10" value="80">
+            <span class="hint">No cambia el score: solo limita cuantas filas aparecen despues de filtrar.</span>
+          </label>
+
+          <label class="check">
+            <input id="revealContact" type="checkbox">
+            Mostrar contacto completo
+          </label>
+
+          <div class="legend">
+            <span><i class="dot high"></i> Alto: score &gt; 0,40</span>
+            <span><i class="dot mid"></i> Medio: 0,20 a 0,40</span>
+            <span><i class="dot low"></i> Bajo: &lt; 0,20</span>
+          </div>
+        </aside>
+
+        <section class="panel table-panel">
+          <div class="panel-title row">
+            <div>
+              <h2>Polizas a contactar</h2>
+              <p id="tableCaption">Ordenadas por score de churn descendente.</p>
+            </div>
+            <button id="copyBtn" type="button">Copiar top 10</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Riesgo</th>
+                  <th>Poliza</th>
+                  <th>Cliente</th>
+                  <th>Contacto</th>
+                  <th>Auto</th>
+                  <th>Cuota</th>
+                  <th>Motivo</th>
+                </tr>
+              </thead>
+              <tbody id="policiesBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section class="layout lower">
+        <section class="panel">
+          <div class="panel-title">
+            <h2>Simulador de poliza nueva</h2>
+            <p>Opcional: estima el riesgo de una poliza que todavia no aparece en el ranking.</p>
+          </div>
+          <form id="predictForm" class="grid-form">
+            <label>Aseguradora
+              <select name="Aseguradora">
+                <option value="zurich">zurich</option>
+                <option value="sura">sura</option>
+                <option value="mercantilAndina">mercantilAndina</option>
+                <option value="allianz">allianz</option>
+                <option value="experta">experta</option>
+              </select>
+            </label>
+            <label>Tipo de cobertura
+              <select name="Cluster_Detalle">
+                <option value="Terceros Completo Premium">Terceros Completo Premium</option>
+                <option value="Terceros Completo">Terceros Completo</option>
+                <option value="Todo Riesgo con Franquicia Alta">Todo Riesgo con Franquicia Alta</option>
+                <option value="Todo Riesgo con Franquicia Baja">Todo Riesgo con Franquicia Baja</option>
+              </select>
+            </label>
+            <label>Metodo de pago
+              <select name="Metodo_de_pago">
+                <option value="creditCard">creditCard</option>
+                <option value="bankAccount">bankAccount</option>
+              </select>
+            </label>
+            <label>Provincia<input name="provincia" value="Capital Federal"></label>
+            <label>Genero
+              <select name="genero_cliente">
+                <option value="male">male</option>
+                <option value="female">female</option>
+                <option value="Sin dato">Sin dato</option>
+              </select>
+            </label>
+            <label>Rango comision
+              <select name="rango_comision">
+                <option value="standard">standard</option>
+                <option value="low">low</option>
+                <option value="high">high</option>
+              </select>
+            </label>
+            <label>Fecha inicio<input name="fecha_inicio_poliza" type="date" value="2026-06-24"></label>
+            <label>Fecha nacimiento<input name="fecha_nacimiento" type="date" value="1994-05-10"></label>
+            <label>Anio bien<input name="anio_bien" type="number" value="2018"></label>
+            <label>Comision<input name="Comision_pesos" type="number" value="22000"></label>
+            <label>Cuota mensual<input name="Valor_cuota_mes_pesos" type="number" value="145000"></label>
+            <label>Valor asegurado<input name="Valor_asegurado_pesos" type="number" value="24000000"></label>
+            <label>GNC
+              <select name="GNC">
+                <option value="false">false</option>
+                <option value="true">true</option>
+              </select>
+            </label>
+            <label>Renovacion ID<input name="Es_renovacion_ID_poliza_anterior" value=""></label>
+            <button type="submit">Predecir</button>
+          </form>
+        </section>
+
+        <section class="panel result-panel">
+          <div class="panel-title">
+            <h2>Resultado</h2>
+            <p>Score estimado para la poliza nueva ingresada.</p>
+          </div>
+          <div id="predictionResult" class="empty">Este simulador sirve para evaluar una poliza al momento de emitirla. Para operar la cartera actual, usa la lista de polizas a contactar.</div>
+        </section>
       </section>
     </section>
 
-    <section class="layout lower">
-      <section class="panel">
-        <div class="panel-title">
-          <h2>Simulador de poliza nueva</h2>
-          <p>Opcional: estima el riesgo de una poliza que todavia no aparece en el ranking.</p>
-        </div>
-        <form id="predictForm" class="grid-form">
-          <label>Aseguradora
-            <select name="Aseguradora">
-              <option value="zurich">zurich</option>
-              <option value="sura">sura</option>
-              <option value="mercantilAndina">mercantilAndina</option>
-              <option value="allianz">allianz</option>
-              <option value="experta">experta</option>
-            </select>
-          </label>
-          <label>Tipo de cobertura
-            <select name="Cluster_Detalle">
-              <option value="Terceros Completo Premium">Terceros Completo Premium</option>
-              <option value="Terceros Completo">Terceros Completo</option>
-              <option value="Todo Riesgo con Franquicia Alta">Todo Riesgo con Franquicia Alta</option>
-              <option value="Todo Riesgo con Franquicia Baja">Todo Riesgo con Franquicia Baja</option>
-            </select>
-          </label>
-          <label>Metodo de pago
-            <select name="Metodo_de_pago">
-              <option value="creditCard">creditCard</option>
-              <option value="bankAccount">bankAccount</option>
-            </select>
-          </label>
-          <label>Provincia<input name="provincia" value="Capital Federal"></label>
-          <label>Genero
-            <select name="genero_cliente">
-              <option value="male">male</option>
-              <option value="female">female</option>
-              <option value="Sin dato">Sin dato</option>
-            </select>
-          </label>
-          <label>Rango comision
-            <select name="rango_comision">
-              <option value="standard">standard</option>
-              <option value="low">low</option>
-              <option value="high">high</option>
-            </select>
-          </label>
-          <label>Fecha inicio<input name="fecha_inicio_poliza" type="date" value="2026-06-24"></label>
-          <label>Fecha nacimiento<input name="fecha_nacimiento" type="date" value="1994-05-10"></label>
-          <label>Anio bien<input name="anio_bien" type="number" value="2018"></label>
-          <label>Comision<input name="Comision_pesos" type="number" value="22000"></label>
-          <label>Cuota mensual<input name="Valor_cuota_mes_pesos" type="number" value="145000"></label>
-          <label>Valor asegurado<input name="Valor_asegurado_pesos" type="number" value="24000000"></label>
-          <label>GNC
-            <select name="GNC">
-              <option value="false">false</option>
-              <option value="true">true</option>
-            </select>
-          </label>
-          <label>Renovacion ID<input name="Es_renovacion_ID_poliza_anterior" value=""></label>
-          <button type="submit">Predecir</button>
-        </form>
+    <section id="insightsView" class="tab-view">
+      <section class="insight-grid">
+        <article class="panel insight-card emphasis">
+          <span>Campana sugerida</span>
+          <strong id="campaignTitle">-</strong>
+          <p id="campaignText">Se calcula con las polizas cargadas.</p>
+        </article>
+        <article class="panel insight-card">
+          <span>Mayor concentracion</span>
+          <strong id="concentrationTitle">-</strong>
+          <p id="concentrationText">Segmento con mas polizas de alto riesgo.</p>
+        </article>
+        <article class="panel insight-card">
+          <span>Cobertura operativa</span>
+          <strong id="coverageTitle">-</strong>
+          <p id="coverageText">Cantidad de contactos sugeridos por prioridad.</p>
+        </article>
       </section>
 
-      <section class="panel result-panel">
-        <div class="panel-title">
-          <h2>Resultado</h2>
-          <p>Score estimado para la poliza nueva ingresada.</p>
-        </div>
-        <div id="predictionResult" class="empty">Este simulador sirve para evaluar una poliza al momento de emitirla. Para operar la cartera actual, usa la lista de polizas a contactar.</div>
+      <section class="insight-layout">
+        <article class="panel chart-panel">
+          <div class="panel-title">
+            <h2>Distribucion por riesgo</h2>
+            <p>Ayuda a dimensionar la carga de trabajo de retencion.</p>
+          </div>
+          <div id="riskChart" class="bar-chart"></div>
+        </article>
+
+        <article class="panel chart-panel">
+          <div class="panel-title">
+            <h2>Alto riesgo por aseguradora</h2>
+            <p>Donde conviene revisar oferta, postventa o mensajes de contacto.</p>
+          </div>
+          <div id="insurerChart" class="bar-chart"></div>
+        </article>
+
+        <article class="panel chart-panel">
+          <div class="panel-title">
+            <h2>Alto riesgo por metodo de pago</h2>
+            <p>Senal util para acciones preventivas sobre cobranzas/onboarding.</p>
+          </div>
+          <div id="paymentChart" class="bar-chart"></div>
+        </article>
+
+        <article class="panel chart-panel">
+          <div class="panel-title">
+            <h2>Alto riesgo por region</h2>
+            <p>Permite repartir llamadas o comparar comportamiento geografico.</p>
+          </div>
+          <div id="regionChart" class="bar-chart"></div>
+        </article>
+
+        <article class="panel chart-panel wide">
+          <div class="panel-title">
+            <h2>Principales drivers en polizas de alto riesgo</h2>
+            <p>Motivos mas frecuentes para priorizar el contacto.</p>
+          </div>
+          <div id="driverChart" class="bar-chart"></div>
+        </article>
       </section>
     </section>
   </main>

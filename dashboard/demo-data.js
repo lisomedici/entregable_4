@@ -11,163 +11,82 @@ window.DEMO_SUMMARY = {
   prototipo: "Demo web estatica + API local opcional"
 };
 
-window.DEMO_POLICIES = [
-  {
-    id_poliza: "DEMO-001",
-    numero_poliza: "96316987",
-    patente: "LST097",
-    cliente: "Cliente demo 01",
-    email: "cl***@demo.com",
-    telefono: "***9290",
+function money(n) {
+  return Math.round(n).toLocaleString("es-AR");
+}
+
+function policyBase(i) {
+  const marcas = ["FORD", "TOYOTA", "CHEVROLET", "FIAT", "CITROEN", "HONDA", "VOLKSWAGEN", "RENAULT"];
+  const modelos = ["TERRITORY TITANIUM", "COROLLA XEI", "CRUZE PREMIER", "ARGO PRECISION", "C 3 PICASSO", "HR-V EXL", "GOLF HIGHLINE", "SANDERO STEPWAY"];
+  const regiones = ["GBA", "CABA", "Interior"];
+  const aseguradoras = ["zurich", "sura", "mercantilAndina", "allianz", "experta"];
+  const idx = i % marcas.length;
+
+  return {
+    id_poliza: `DEMO-${String(i).padStart(4, "0")}`,
+    numero_poliza: String(90000000 + i * 7919),
+    patente: i === 4 ? "AG701WM" : `D${String(i).padStart(3, "0")}MO`,
+    cliente: `Cliente demo ${String(i).padStart(3, "0")}`,
+    email: `cl***${String(i).padStart(3, "0")}@demo.com`,
+    telefono: `***${String(1000 + i).slice(-4)}`,
     estado: "activated",
-    aseguradora: "zurich",
-    cobertura: "Terceros completo",
-    metodo_pago: "bankAccount",
-    region: "GBA",
-    provincia: "Buenos Aires",
-    marca: "CITROEN",
-    modelo: "C 3 PICASSO 1.6I SX",
-    fecha_inicio: "2025-09-08",
-    cuota: "172.741",
-    comision: "26.670",
-    score_churn: 0.455,
-    nivel_riesgo: "Alto",
-    accion_recomendada: "Contactar en la primera semana y revisar dolor de precio/cobertura.",
-    razones: [
-      { label: "cuota", text: "Cuota mensual alta", impact: 0.11 },
-      { label: "aseguradora", text: "Aseguradora con mayor churn historico", impact: 0.10 },
-      { label: "renovacion", text: "Poliza nueva, no renovacion", impact: 0.06 }
-    ]
-  },
-  {
-    id_poliza: "DEMO-002",
-    numero_poliza: "90006347993",
-    patente: "OZR997",
-    cliente: "Cliente demo 02",
-    email: "cl***@demo.com",
-    telefono: "***5358",
-    estado: "activated",
-    aseguradora: "zurich",
-    cobertura: "Terceros completo con granizo",
-    metodo_pago: "bankAccount",
-    region: "GBA",
-    provincia: "Buenos Aires",
-    marca: "TOYOTA",
-    modelo: "COROLLA 1.8 XEI",
-    fecha_inicio: "2025-10-15",
-    cuota: "211.274",
-    comision: "33.253",
-    score_churn: 0.455,
-    nivel_riesgo: "Alto",
-    accion_recomendada: "Contactar en la primera semana y revisar dolor de precio/cobertura.",
-    razones: [
-      { label: "cuota", text: "Cuota mensual alta", impact: 0.11 },
-      { label: "aseguradora", text: "Aseguradora con mayor churn historico", impact: 0.10 },
-      { label: "pago", text: "Metodo de pago CBU", impact: 0.06 }
-    ]
-  },
-  {
-    id_poliza: "DEMO-003",
-    numero_poliza: "516526560",
-    patente: "AF977MQ",
-    cliente: "Cliente demo 03",
-    email: "cl***@demo.com",
-    telefono: "***4043",
-    estado: "activated",
-    aseguradora: "mercantilAndina",
-    cobertura: "Todo riesgo franquicia alta",
-    metodo_pago: "creditCard",
-    region: "Interior",
-    provincia: "Entre Rios",
-    marca: "CHEVROLET",
-    modelo: "CRUZE 1.4 PREMIER AT",
-    fecha_inicio: "2025-12-19",
-    cuota: "85.072",
-    comision: "10.044",
-    score_churn: 0.342,
-    nivel_riesgo: "Medio",
-    accion_recomendada: "Seguimiento preventivo durante onboarding.",
-    razones: [
-      { label: "aseguradora", text: "Aseguradora con riesgo medio-alto", impact: 0.05 },
-      { label: "renovacion", text: "Poliza nueva, no renovacion", impact: 0.06 }
-    ]
-  },
-  {
-    id_poliza: "DEMO-004",
-    numero_poliza: "594919924",
-    patente: "AG701WM",
-    cliente: "Cliente demo 04",
-    email: "cl***@demo.com",
-    telefono: "***5447",
-    estado: "activated",
-    aseguradora: "sura",
-    cobertura: "Terceros completo premium",
-    metodo_pago: "creditCard",
-    region: "CABA",
-    provincia: "Capital Federal",
-    marca: "FORD",
-    modelo: "TERRITORY TITANIUM",
-    fecha_inicio: "2026-01-24",
-    cuota: "230.364",
-    comision: "27.055",
-    score_churn: 0.443,
-    nivel_riesgo: "Alto",
-    accion_recomendada: "Contactar en la primera semana y revisar dolor de precio/cobertura.",
-    razones: [
+    aseguradora: aseguradoras[i % aseguradoras.length],
+    cobertura: i % 3 === 0 ? "Terceros completo premium" : "Todo riesgo franquicia",
+    metodo_pago: i % 4 === 0 ? "bankAccount" : "creditCard",
+    region: regiones[i % regiones.length],
+    provincia: regiones[i % regiones.length] === "CABA" ? "Capital Federal" : regiones[i % regiones.length] === "GBA" ? "Buenos Aires" : "Interior",
+    marca: marcas[idx],
+    modelo: modelos[idx],
+    fecha_inicio: `2026-${String((i % 6) + 1).padStart(2, "0")}-${String((i % 26) + 1).padStart(2, "0")}`,
+    cuota: money(70000 + (i % 120) * 1250),
+    comision: money(9000 + (i % 70) * 310)
+  };
+}
+
+function reasonsFor(level) {
+  if (level === "Alto") {
+    return [
       { label: "cuota", text: "Cuota mensual alta", impact: 0.11 },
       { label: "aseguradora", text: "Aseguradora con churn sobre promedio", impact: 0.08 },
-      { label: "cobertura", text: "Cobertura de terceros", impact: 0.04 }
-    ]
-  },
-  {
-    id_poliza: "DEMO-005",
-    numero_poliza: "2324485910",
-    patente: "AE064VW",
-    cliente: "Cliente demo 05",
-    email: "cl***@demo.com",
-    telefono: "***7718",
-    estado: "activated",
-    aseguradora: "allianz",
-    cobertura: "Terceros completo",
-    metodo_pago: "creditCard",
-    region: "GBA",
-    provincia: "Buenos Aires",
-    marca: "FIAT",
-    modelo: "ARGO 1.8 PRECISION",
-    fecha_inicio: "2025-08-20",
-    cuota: "84.691",
-    comision: "12.161",
-    score_churn: 0.244,
-    nivel_riesgo: "Medio",
-    accion_recomendada: "Seguimiento preventivo durante onboarding.",
-    razones: [
-      { label: "renovacion", text: "Poliza nueva, no renovacion", impact: 0.06 },
-      { label: "cobertura", text: "Cobertura de terceros", impact: 0.04 }
-    ]
-  },
-  {
-    id_poliza: "DEMO-006",
-    numero_poliza: "90289716",
-    patente: "AD986CJ",
-    cliente: "Cliente demo 06",
-    email: "cl***@demo.com",
-    telefono: "***1867",
-    estado: "activated",
-    aseguradora: "experta",
-    cobertura: "Todo riesgo franquicia baja",
-    metodo_pago: "creditCard",
-    region: "CABA",
-    provincia: "Capital Federal",
-    marca: "CHRYSLER",
-    modelo: "JEEP RENEGADE SPORT",
-    fecha_inicio: "2025-10-30",
-    cuota: "122.840",
-    comision: "19.224",
-    score_churn: 0.196,
-    nivel_riesgo: "Bajo",
-    accion_recomendada: "Flujo normal de onboarding.",
-    razones: [
-      { label: "cuota", text: "Cuota mensual media-alta", impact: 0.06 }
-    ]
+      { label: "renovacion", text: "Poliza nueva, no renovacion", impact: 0.06 }
+    ];
   }
-];
+  if (level === "Medio") {
+    return [
+      { label: "cuota", text: "Cuota mensual media-alta", impact: 0.06 },
+      { label: "cobertura", text: "Cobertura de terceros", impact: 0.04 }
+    ];
+  }
+  return [
+    { label: "perfil", text: "Sin driver critico dominante", impact: 0.01 }
+  ];
+}
+
+function makePolicy(i, level, score) {
+  const p = policyBase(i);
+  p.score_churn = Math.round(score * 1000) / 1000;
+  p.nivel_riesgo = level;
+  p.accion_recomendada = level === "Alto"
+    ? "Contactar en la primera semana y revisar dolor de precio/cobertura."
+    : level === "Medio"
+      ? "Seguimiento preventivo durante onboarding."
+      : "Flujo normal de onboarding.";
+  p.razones = reasonsFor(level);
+  return p;
+}
+
+const policies = [];
+
+for (let i = 1; i <= 55; i += 1) {
+  policies.push(makePolicy(i, "Alto", 0.47 - (i % 30) * 0.002));
+}
+
+for (let i = 56; i <= 1173; i += 1) {
+  policies.push(makePolicy(i, "Medio", 0.39 - (i % 180) * 0.001));
+}
+
+for (let i = 1174; i <= 1200; i += 1) {
+  policies.push(makePolicy(i, "Bajo", 0.19 - (i % 25) * 0.003));
+}
+
+window.DEMO_POLICIES = policies.sort((a, b) => b.score_churn - a.score_churn);

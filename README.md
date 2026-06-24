@@ -51,6 +51,13 @@ powershell -ExecutionPolicy Bypass -File .\run_dashboard.ps1 -CsvPath "C:\ruta\a
 - `POST /api/batch`: prediccion por lote enviando un array JSON.
 - `GET /api/schema`: entradas esperadas y salidas.
 
+## Como leer el dashboard
+
+- **Filtros de priorizacion**: sirven para decidir que parte del ranking mirar. No recalculan el modelo.
+- **Nivel de riesgo**: filtra las polizas por score: Alto `> 0,40`, Medio `0,20 a 0,40`, Bajo `< 0,20`.
+- **Maximo a mostrar**: limita cuantas filas se ven en la tabla despues de aplicar busqueda y filtro. Por ejemplo, si hay 1.118 polizas de riesgo medio y el maximo es 80, muestra las 80 de mayor score dentro de Medio.
+- **Buscar poliza, patente o cliente**: busca dentro de la lista evaluada.
+
 ## Nota metodologica
 
 El Entregable 3 selecciono XGBoost como modelo ganador, con Precision@Top20% de 49,1% y ROC-AUC de 0,731 en validacion out-of-time.

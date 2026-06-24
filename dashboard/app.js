@@ -1,5 +1,6 @@
 const state = {
   policies: [],
+  totalMatches: 0,
   filtered: [],
   demoMode: false
 };
@@ -42,13 +43,12 @@ async function loadSummary() {
 }
 
 async function loadPolicies() {
-  const limit = Number(el("limitInput").value || 80);
   const reveal = el("revealContact").checked ? "1" : "0";
   try {
-    state.policies = await getJson(`/api/policies?limit=${limit}&reveal=${reveal}`);
+    state.policies = await getJson(`/api/policies?limit=1200&reveal=${reveal}`);
     state.demoMode = false;
   } catch {
-    state.policies = (window.DEMO_POLICIES || []).slice(0, limit);
+    state.policies = window.DEMO_POLICIES || [];
     state.demoMode = true;
   }
   applyFilters();
@@ -57,12 +57,15 @@ async function loadPolicies() {
 function applyFilters() {
   const query = el("searchInput").value.trim().toLowerCase();
   const risk = el("riskFilter").value;
+  const limit = Number(el("limitInput").value || 80);
 
-  state.filtered = state.policies.filter((p) => {
+  const matches = state.policies.filter((p) => {
     const matchesRisk = risk === "todos" || p.nivel_riesgo === risk;
     const blob = `${p.id_poliza} ${p.numero_poliza} ${p.patente} ${p.cliente} ${p.email} ${p.telefono} ${p.marca} ${p.modelo}`.toLowerCase();
     return matchesRisk && (!query || blob.includes(query));
   });
+  state.totalMatches = matches.length;
+  state.filtered = matches.slice(0, limit);
 
   renderPolicies();
 }
@@ -83,7 +86,7 @@ function renderPolicies() {
   const body = el("policiesBody");
   body.innerHTML = "";
   const mode = state.demoMode ? "Modo web demo con datos anonimos. " : "";
-  el("tableCaption").textContent = `${mode}${state.filtered.length} polizas visibles, ordenadas por score descendente.`;
+  el("tableCaption").textContent = `${mode}${state.totalMatches} coincidencias; mostrando ${state.filtered.length}, ordenadas por score descendente.`;
 
   if (!state.filtered.length) {
     body.innerHTML = `<tr><td colspan="7">No hay polizas para los filtros seleccionados.</td></tr>`;

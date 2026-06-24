@@ -45,7 +45,7 @@ async function loadSummary() {
 async function loadPolicies() {
   const reveal = el("revealContact").checked ? "1" : "0";
   try {
-    state.policies = await getJson(`/api/policies?limit=1200&reveal=${reveal}`);
+    state.policies = await getJson(`/api/policies?limit=5000&reveal=${reveal}`);
     state.demoMode = false;
   } catch {
     state.policies = window.DEMO_POLICIES || [];
@@ -153,7 +153,7 @@ function renderInsights() {
 function renderPolicies() {
   const body = el("policiesBody");
   body.innerHTML = "";
-  const mode = state.demoMode ? "Modo web demo con datos anonimos. " : "";
+  const mode = state.demoMode ? "Modo web demo con datos anonimizados generados desde el CSV. " : "";
   el("tableCaption").textContent = `${mode}${state.totalMatches} coincidencias; mostrando ${state.filtered.length}, ordenadas por score descendente.`;
 
   if (!state.filtered.length) {

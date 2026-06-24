@@ -6,7 +6,7 @@ Prototipo funcional para operacionalizar el modelo de churn temprano de Kavak Se
 
 - API local ejecutable en PowerShell.
 - Dashboard HTML que consume la API.
-- Version web estatica para GitHub Pages, con datos demo anonimos.
+- Version web estatica para GitHub Pages, con datos demo anonimizados generados desde el CSV.
 - Ranking de polizas activas ordenadas por score de churn.
 - Solapa de insights con graficos de riesgo por aseguradora, metodo de pago, region y drivers.
 - Prediccion individual para simular una poliza nueva.
@@ -17,7 +17,7 @@ El dashboard se puede abrir directo desde el repo con este link:
 
 https://raw.githack.com/lisomedici/entregable_4/86a2c03eff6fabf237acf784910c09f83aeeb0f3/dashboard/index.html
 
-La version web funciona sin instalar nada. Usa datos demo anonimos para no publicar informacion personal de clientes.
+La version web funciona sin instalar nada. Usa 1.500 polizas activas anonimizadas y generadas desde el CSV para no publicar informacion personal de clientes.
 
 Si se habilita GitHub Pages en Settings, tambien puede publicarse como:
 
@@ -67,7 +67,7 @@ Como en esta computadora no esta disponible Python ni el `.joblib` entrenado, el
 
 La arquitectura deja el scoring encapsulado en `api/server.ps1`. En una version productiva, esa funcion se reemplaza por la carga del modelo persistido (`mejor_modelo_churn.joblib`) y los encoders generados desde Colab, manteniendo iguales los endpoints y el dashboard.
 
-Para que la demo abra rapido en una computadora sin Python, el ranking inicial scorea una muestra operativa de hasta 1.200 polizas activas del CSV. El endpoint y la interfaz quedan listos para ampliar ese limite si se ejecuta en un entorno mas comodo.
+Para que la demo abra rapido en una computadora sin Python, la version web incluye `dashboard/demo-data.js`, generado con `scripts/generate_demo_data.ps1` desde el CSV real. El archivo conserva distribuciones utiles para la demo, pero anonimiza poliza, patente, cliente, email y telefono.
 
 En GitHub Pages no se ejecuta la API PowerShell. Por eso `dashboard/app.js` intenta consumir `/api/*` y, si no existe, cambia automaticamente a modo demo web con `dashboard/demo-data.js`.
 

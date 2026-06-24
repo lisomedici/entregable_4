@@ -285,7 +285,7 @@ function Build-ModelContext([string]$Path) {
     quantiles = [pscustomobject]@{}
   }
 
-  $activeRows = @($realRows | Where-Object { "$($_.Estado_poliza)".Trim() -eq "activated" } | Select-Object -First 1200)
+  $activeRows = @($realRows | Where-Object { "$($_.Estado_poliza)".Trim() -eq "activated" })
   Write-Host "Polizas activas para scorear: $($activeRows.Count)"
   $active = foreach ($r in $activeRows) {
     $anioBien = To-Number $r.anio_bien

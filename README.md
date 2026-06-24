@@ -1,0 +1,59 @@
+# Entregable 4 - Kavak Seguros Churn Temprano
+
+Prototipo funcional para operacionalizar el modelo de churn temprano de Kavak Seguros.
+
+## Que incluye
+
+- API local ejecutable en PowerShell.
+- Dashboard HTML que consume la API.
+- Ranking de polizas activas ordenadas por score de churn.
+- Prediccion individual para simular una poliza nueva.
+- Presentacion corta en HTML para abrir durante la exposicion.
+
+## Como correrlo
+
+Desde esta carpeta:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\run_dashboard.ps1
+```
+
+Luego abrir:
+
+- Dashboard: http://localhost:8787/
+- Presentacion: http://localhost:8787/presentacion
+- Healthcheck API: http://localhost:8787/api/health
+
+Si el CSV esta en otra ruta:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\run_dashboard.ps1 -CsvPath "C:\ruta\archivo.csv"
+```
+
+## Endpoints principales
+
+- `GET /api/summary`: metricas generales del prototipo.
+- `GET /api/policies?limit=80&reveal=0`: polizas activas priorizadas.
+- `POST /api/predict`: prediccion individual.
+- `POST /api/batch`: prediccion por lote enviando un array JSON.
+- `GET /api/schema`: entradas esperadas y salidas.
+
+## Nota metodologica
+
+El Entregable 3 selecciono XGBoost como modelo ganador, con Precision@Top20% de 49,1% y ROC-AUC de 0,731 en validacion out-of-time.
+
+Como en esta computadora no esta disponible Python ni el `.joblib` entrenado, el prototipo usa un scorecard local reproducible con las mismas variables seguras definidas en los notebooks: aseguradora, cluster, metodo de pago, region, genero, rango de comision, edad, antiguedad del vehiculo, cuota, comision, renovacion y GNC.
+
+La arquitectura deja el scoring encapsulado en `api/server.ps1`. En una version productiva, esa funcion se reemplaza por la carga del modelo persistido (`mejor_modelo_churn.joblib`) y los encoders generados desde Colab, manteniendo iguales los endpoints y el dashboard.
+
+Para que la demo abra rapido en una computadora sin Python, el ranking inicial scorea una muestra operativa de hasta 1.200 polizas activas del CSV. El endpoint y la interfaz quedan listos para ampliar ese limite si se ejecuta en un entorno mas comodo.
+
+## Guion de demo sugerido
+
+1. Problema: detectar churn temprano para contactar antes de la baja.
+2. Recordatorio del modelo: XGBoost gano y supera KPI de Precision@Top20%.
+3. Mostrar la API local en ejecucion.
+4. Abrir el dashboard y explicar la lista priorizada.
+5. Filtrar por alto riesgo y mostrar drivers.
+6. Ejecutar una prediccion individual.
+7. Cerrar con proximos pasos: persistir `.joblib`, registrar contactos y reentrenar trimestralmente.
